@@ -80,7 +80,9 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const cargar = useCallback(async () => {
+  // "silencioso" recarga sin mostrar la pantalla de carga: así la página abierta no se desmonta
+  // y conserva sus mensajes y formularios después de guardar.
+  const cargar = useCallback(async ({ silencioso = false } = {}) => {
     if (!usuario) {
       setCandidatos([])
       setSolicitudes([])
@@ -89,7 +91,7 @@ export function DataProvider({ children }) {
       return
     }
 
-    setLoading(true)
+    if (!silencioso) setLoading(true)
     setError('')
     const [postRes, solRes, evalRes, perfilesRes] = await Promise.all([
       supabase.from('postulantes').select('*').order('created_at', { ascending: false }),
@@ -173,7 +175,7 @@ export function DataProvider({ children }) {
     }
     const { data, error } = await supabase.from('solicitudes').insert(payload).select('*').single()
     if (error) throw error
-    await cargar()
+    await cargar({ silencioso: true })
     return solicitudes.find((s) => s.id === data.id) ?? { id: data.id }
   }
 
@@ -235,7 +237,7 @@ export function DataProvider({ children }) {
       if (error) throw error
     }
 
-    await cargar()
+    await cargar({ silencioso: true })
     return true
   }
 

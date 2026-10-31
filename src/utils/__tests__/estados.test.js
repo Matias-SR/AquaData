@@ -4,6 +4,7 @@ import {
   competenciasDe,
   documentosPorFamilia,
   formatearFecha,
+  formatearHora,
   hoyISO,
   informeVacio,
 } from '../estados.js'
@@ -23,6 +24,26 @@ describe('formatearFecha', () => {
   it('muestra un guion cuando no hay fecha', () => {
     expect(formatearFecha(null)).toBe('—')
     expect(formatearFecha('')).toBe('—')
+  })
+})
+
+describe('formatearHora', () => {
+  it('quita los segundos de la hora que entrega la base de datos', () => {
+    expect(formatearHora('15:00:00')).toBe('15:00')
+  })
+
+  it('mantiene una hora que ya viene sin segundos', () => {
+    expect(formatearHora('09:30')).toBe('09:30')
+  })
+
+  it('agrega el cero inicial a las horas de un dígito', () => {
+    expect(formatearHora('9:05')).toBe('09:05')
+  })
+
+  it('muestra un guion cuando no hay hora o el valor no es una hora', () => {
+    expect(formatearHora(null)).toBe('—')
+    expect(formatearHora('')).toBe('—')
+    expect(formatearHora('mañana')).toBe('—')
   })
 })
 

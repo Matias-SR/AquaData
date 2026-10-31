@@ -25,6 +25,20 @@ export function validarCandidato(d) {
   if (!d.telefono || !REGEX_TELEFONO.test(d.telefono.trim())) e.telefono = 'Usa un celular chileno, por ejemplo +56 9 1234 5678.'
   if (!d.cargo || d.cargo.trim().length < 3) e.cargo = 'Indica el cargo al que postula.'
   if (!d.familiaCargo) e.familiaCargo = 'Selecciona la familia de cargo.'
+  if (!d.ubicacion) e.ubicacion = 'Selecciona la ubicación.'
+  if (!d.origen) e.origen = 'Indica si el postulante es interno o externo.'
+  return e
+}
+
+export const ROLES_USUARIO = ['analista', 'evaluador', 'jefatura']
+
+// Al editar un usuario no se cambia la contraseña, por eso solo se exige al crear.
+export function validarUsuario(d, { edicion = false } = {}) {
+  const e = {}
+  if (!d.nombre || d.nombre.trim().length < 3) e.nombre = 'Ingresa el nombre completo (mínimo 3 caracteres).'
+  if (!d.correo || !REGEX_CORREO.test(d.correo.trim())) e.correo = 'Ingresa un correo válido, por ejemplo nombre@aquachile.cl.'
+  if (!ROLES_USUARIO.includes(d.rol)) e.rol = 'Selecciona el rol del usuario.'
+  if (!edicion && (!d.password || d.password.length < 8)) e.password = 'La contraseña inicial debe tener al menos 8 caracteres.'
   return e
 }
 

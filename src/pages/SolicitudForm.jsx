@@ -51,10 +51,12 @@ export default function SolicitudForm() {
           responsableId: datos.responsableId,
           observaciones: datos.observaciones,
         })
-        navigate(`/solicitudes/${existente.id}`)
+        navigate(`/solicitudes/${existente.id}`, { state: { mensaje: 'Los cambios de la solicitud se guardaron.' } })
       } else {
         const nueva = await agregarSolicitud({ ...datos, candidatoId: datos.candidatoId, creadaPor: usuario.nombre })
-        navigate(`/solicitudes/${nueva.id}`)
+        const evaluador = evaluadores.find((r) => r.id === datos.responsableId)?.nombre
+        const mensaje = evaluador ? `Solicitud creada y asignada a ${evaluador}.` : 'Solicitud creada correctamente.'
+        navigate(`/solicitudes/${nueva.id}`, { state: { mensaje } })
       }
     } catch (error) {
       setErrorGeneral(error.message || 'No fue posible guardar la solicitud.')

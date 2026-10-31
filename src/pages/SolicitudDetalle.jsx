@@ -1,24 +1,32 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Alert, Button, Col, Form, Row } from 'react-bootstrap'
+import { Button, Col, Form, Row } from 'react-bootstrap'
 import { useData } from '../context/DataContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import EstadoBadge from '../components/EstadoBadge.jsx'
+import AlertaTemporal from '../components/AlertaTemporal.jsx'
 import InformeEditor from '../components/InformeEditor.jsx'
 import InformeVista from '../components/InformeVista.jsx'
-import { ESTADOS, formatearFecha, hoyISO } from '../utils/estados.js'
+import { ESTADOS, formatearFecha, formatearHora, hoyISO } from '../utils/estados.js'
 import { puedeEditarSolicitud } from '../utils/flujo.js'
 import { validarEntrevista } from '../utils/validaciones.js'
+import { useMensajeNavegacion } from '../hooks/useMensajeNavegacion.js'
+
+const exito = (texto) => ({ variant: 'success', texto })
+const fallo = (texto) => ({ variant: 'danger', texto })
 
 export default function SolicitudDetalle() {
   const { id } = useParams()
   const { solicitudPorId, candidatoPorId, actualizarSolicitud } = useData()
   const { usuario, can } = useAuth()
   const solicitud = solicitudPorId(id)
+  const mensajeInicial = useMensajeNavegacion()
 
-  const [entrevista, setEntrevista] = useState(solicitud?.entrevista ?? { fecha: hoyISO(), hora: '' })
+  const [entrevista, setEntrevista] = useState(solicitud?.entrevista
+    ? { ...solicitud.entrevista, hora: solicitud.entrevista.hora ? formatearHora(solicitud.entrevista.hora) : '' }
+    : { fecha: hoyISO(), hora: '' })
   const [errores, setErrores] = useState({})
-  const [mensaje, setMensaje] = useState('')
+  const [mensaje, setMensaje] = useState(mensajeInicial ? exito(mensajeInicial) : null)
 
   if (!solicitud) {
     return (
@@ -36,29 +44,32 @@ export default function SolicitudDetalle() {
   const { estado } = solicitud
 
   const agendar = async () => {
-    setMensaje('')
+    setMensaje(null)
     const e = validarEntrevista(entrevista, solicitud.fechaSolicitud)
     setErrores(e)
     if (Object.keys(e).length) return
-    try { await actualizarSolicitud(solicitud.id, { entrevista, estado: 'Entrevista agendada' }); setMensaje('Entrevista agendada. La solicitud pasó a la etapa Entrevista agendada.') } catch (error) { setMensaje(`No fue posible guardar: ${error.message}`) }
+    try { await actualizarSolicitud(solicitud.id, { entrevista, estado: 'Entrevista agendada' }); setMensaje(exito('Entrevista agendada. La solicitud pasó a la etapa Entrevista agendada.')) } catch (error) { setMensaje(fallo(`No fue posible guardar: ${error.message}`)) }
   }
 
   const marcarRealizada = async () => {
-    try { await actualizarSolicitud(solicitud.id, { estado: 'Entrevista realizada' }); setMensaje('Entrevista registrada. Ahora puedes redactar el informe.') } catch (error) { setMensaje(`No fue posible guardar: ${error.message}`) }
+    try { await actualizarSolicitud(solicitud.id, { estado: 'Entrevista realizada' }); setMensaje(exito('Entrevista registrada. Ahora puedes redactar el informe.')) } catch (error) { setMensaje(fallo(`No fue posible guardar: ${error.message}`)) }
   }
 
-  const guardarBorrador = async (informe) => { try { await actualizarSolicitud(solicitud.id, { informe }); setMensaje('Borrador guardado en Supabase.') } catch (error) { setMensaje(`No fue posible guardar: ${error.message}`) } }
+  // El editor muestra el resultado del borrador; aquí solo se relanza el error para que lo informe.
+  const guardarBorrador = (informe) => actualizarSolicitud(solicitud.id, { informe })
 
+  // Si falla, el error vuelve al editor, que sigue abierto. Si resulta, el editor se cierra y el aviso queda aquí.
   const enviarInforme = async (informe) => {
-    try { await actualizarSolicitud(solicitud.id, { informe, estado: 'Informe enviado', fechaEnvio: hoyISO(), informeRecibido: false }); setMensaje('Informe enviado al analista.') } catch (error) { setMensaje(`No fue posible enviar el informe: ${error.message}`) }
+    await actualizarSolicitud(solicitud.id, { informe, estado: 'Informe enviado', fechaEnvio: hoyISO(), informeRecibido: false })
+    setMensaje(exito('Informe enviado al analista.'))
   }
 
   const reabrirInforme = async () => {
-    try { await actualizarSolicitud(solicitud.id, { estado: 'Entrevista realizada', informeRecibido: false }); setMensaje('Informe reabierto. Corrígelo y vuelve a enviarlo.') } catch (error) { setMensaje(`No fue posible reabrir: ${error.message}`) }
+    try { await actualizarSolicitud(solicitud.id, { estado: 'Entrevista realizada', informeRecibido: false }); setMensaje(exito('Informe reabierto. Corrígelo y vuelve a enviarlo.')) } catch (error) { setMensaje(fallo(`No fue posible reabrir: ${error.message}`)) }
   }
 
   const marcarRecibido = async () => {
-    try { await actualizarSolicitud(solicitud.id, { informeRecibido: true }); setMensaje('Marcaste el informe como recibido.') } catch (error) { setMensaje(`No fue posible guardar: ${error.message}`) }
+    try { await actualizarSolicitud(solicitud.id, { informeRecibido: true }); setMensaje(exito('Marcaste el informe como recibido.')) } catch (error) { setMensaje(fallo(`No fue posible guardar: ${error.message}`)) }
   }
 
   const cambiarEntrevista = (campo) => (ev) => {
@@ -78,7 +89,7 @@ export default function SolicitudDetalle() {
             <p className="mb-3">
               {estado === 'Evaluación recibida'
                 ? 'Siguiente paso: coordinar la entrevista con el candidato y agendarla.'
-                : `Entrevista agendada para el ${formatearFecha(solicitud.entrevista?.fecha)} a las ${solicitud.entrevista?.hora}.`}
+                : `Entrevista agendada para el ${formatearFecha(solicitud.entrevista?.fecha)} a las ${formatearHora(solicitud.entrevista?.hora)}.`}
             </p>
             <Row className="g-3">
               <Col sm={6}>
@@ -178,9 +189,15 @@ export default function SolicitudDetalle() {
       </ol>
 
       {mensaje && (
-        <Alert variant="success" className="mt-3" dismissible onClose={() => setMensaje('')}>
-          {mensaje}
-        </Alert>
+        <AlertaTemporal
+          variant={mensaje.variant}
+          duracion={mensaje.variant === 'success' ? 6000 : undefined}
+          desplazar
+          className="mt-3"
+          onClose={() => setMensaje(null)}
+        >
+          {mensaje.texto}
+        </AlertaTemporal>
       )}
 
       <Row className="g-4 mt-1">

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap'
+import AlertaTemporal from './AlertaTemporal.jsx'
 import { CATEGORIAS, informeVacio } from '../utils/estados.js'
 import { validarInforme } from '../utils/validaciones.js'
 
@@ -7,7 +8,7 @@ import { validarInforme } from '../utils/validaciones.js'
 export default function InformeEditor({ solicitud, onGuardarBorrador, onEnviar }) {
   const [informe, setInforme] = useState(solicitud.informe ?? informeVacio(solicitud.familiaCargo))
   const [errores, setErrores] = useState({})
-  const [aviso, setAviso] = useState('')
+  const [aviso, setAviso] = useState(null)
 
   const cambiar = (campo) => (ev) => {
     setInforme((d) => ({ ...d, [campo]: ev.target.value }))
@@ -24,15 +25,16 @@ export default function InformeEditor({ solicitud, onGuardarBorrador, onEnviar }
   }
 
   const guardar = async () => {
-    try { await onGuardarBorrador(informe); setAviso('Borrador guardado en Supabase.') } catch (error) { setAviso(`No fue posible guardar: ${error.message}`) }
+    setAviso(null)
+    try { await onGuardarBorrador(informe); setAviso({ variant: 'success', texto: 'Borrador guardado.' }) } catch (error) { setAviso({ variant: 'danger', texto: `No fue posible guardar el borrador: ${error.message}` }) }
   }
 
   const enviar = async () => {
-    setAviso('')
+    setAviso(null)
     const e = validarInforme(informe, solicitud.fechaSolicitud)
     setErrores(e)
     if (Object.keys(e).length) return
-    try { await onEnviar(informe) } catch (error) { setAviso(`No fue posible enviar: ${error.message}`) }
+    try { await onEnviar(informe) } catch (error) { setAviso({ variant: 'danger', texto: `No fue posible enviar el informe: ${error.message}` }) }
   }
 
   return (
@@ -42,7 +44,11 @@ export default function InformeEditor({ solicitud, onGuardarBorrador, onEnviar }
         Plantilla asignada: {solicitud.plantillaInforme}. Completa cada sección y envía el informe al analista.
       </p>
 
-      {aviso && <Alert variant="success">{aviso}</Alert>}
+      {aviso && (
+        <AlertaTemporal variant={aviso.variant} duracion={aviso.variant === 'success' ? 5000 : undefined} desplazar onClose={() => setAviso(null)}>
+          {aviso.texto}
+        </AlertaTemporal>
+      )}
       {errores.competencias && <Alert variant="danger">{errores.competencias}</Alert>}
 
       <Row className="g-3 mb-3">

@@ -5,6 +5,7 @@ import {
   validarEntrevista,
   validarInforme,
   validarSolicitud,
+  validarUsuario,
 } from '../validaciones.js'
 
 const candidatoValido = {
@@ -14,6 +15,8 @@ const candidatoValido = {
   telefono: '+56 9 1234 5678',
   cargo: 'Operador de Planta',
   familiaCargo: 'Operario Calificado',
+  ubicacion: 'Planta Calbuco',
+  origen: 'Externo',
 }
 
 const competencia = (cambios = {}) => ({
@@ -62,7 +65,17 @@ describe('validarCandidato', () => {
 
   it('exige todos los campos obligatorios cuando el formulario está vacío', () => {
     const errores = validarCandidato({})
-    expect(Object.keys(errores).sort()).toEqual(['cargo', 'correo', 'familiaCargo', 'nombre', 'rut', 'telefono'])
+    expect(Object.keys(errores).sort()).toEqual(['cargo', 'correo', 'familiaCargo', 'nombre', 'origen', 'rut', 'telefono', 'ubicacion'])
+  })
+
+  it('exige seleccionar la ubicación del postulante', () => {
+    const errores = validarCandidato({ ...candidatoValido, ubicacion: '' })
+    expect(errores).toEqual({ ubicacion: 'Selecciona la ubicación.' })
+  })
+
+  it('exige indicar si el postulante es interno o externo', () => {
+    const errores = validarCandidato({ ...candidatoValido, origen: '' })
+    expect(errores).toEqual({ origen: 'Indica si el postulante es interno o externo.' })
   })
 
   it('rechaza un correo sin dominio', () => {
@@ -147,5 +160,34 @@ describe('validarInforme', () => {
 
   it('rechaza una fecha de evaluación anterior a la solicitud', () => {
     expect(validarInforme({ ...informeValido, fecha: '2026-09-01' }, '2026-10-01').fecha).toBeDefined()
+  })
+})
+
+describe('validarUsuario', () => {
+  const usuarioValido = { nombre: 'Usuario de Prueba', correo: 'usuario@ejemplo.cl', rol: 'evaluador', password: 'clave-segura' }
+
+  it('no reporta errores cuando la cuenta nueva está completa', () => {
+    expect(validarUsuario(usuarioValido)).toEqual({})
+  })
+
+  it('exige nombre, correo y contraseña cuando el formulario de creación está vacío', () => {
+    const errores = validarUsuario({ nombre: '', correo: '', rol: 'analista', password: '' })
+    expect(Object.keys(errores).sort()).toEqual(['correo', 'nombre', 'password'])
+  })
+
+  it('rechaza una contraseña inicial de menos de 8 caracteres', () => {
+    expect(validarUsuario({ ...usuarioValido, password: '1234567' }).password).toBeDefined()
+  })
+
+  it('no exige contraseña al editar un usuario existente', () => {
+    expect(validarUsuario({ ...usuarioValido, password: '' }, { edicion: true })).toEqual({})
+  })
+
+  it('rechaza un correo con formato inválido', () => {
+    expect(validarUsuario({ ...usuarioValido, correo: 'usuario.ejemplo.cl' }).correo).toBeDefined()
+  })
+
+  it('rechaza un rol que no existe en el sistema', () => {
+    expect(validarUsuario({ ...usuarioValido, rol: 'administrador' }).rol).toBeDefined()
   })
 })

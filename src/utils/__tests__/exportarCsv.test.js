@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { aCsv } from '../exportarCsv.js'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { aCsv, descargarCsv } from '../exportarCsv.js'
 
 const columnas = [
   { titulo: 'Postulante', valor: (s) => s.nombre },
@@ -32,5 +32,28 @@ describe('aCsv', () => {
   it('deja la celda vacía cuando el valor no existe', () => {
     const csv = aCsv([{ nombre: undefined, observaciones: null }], columnas)
     expect(csv.slice(1).split('\r\n')[1]).toBe('"";""')
+  })
+})
+
+describe('descargarCsv', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('descarga el archivo con el nombre indicado y libera la URL temporal', async () => {
+    // jsdom no implementa URL.createObjectURL ni la descarga real, por eso se simulan.
+    URL.createObjectURL = vi.fn(() => 'blob:aquachile/solicitudes')
+    URL.revokeObjectURL = vi.fn()
+    let enlace
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function () { enlace = this })
+
+    descargarCsv('solicitudes.csv', aCsv([{ nombre: 'Ana Pérez' }], [{ titulo: 'Postulante', valor: (s) => s.nombre }]))
+
+    expect(click).toHaveBeenCalledTimes(1)
+    expect(enlace.download).toBe('solicitudes.csv')
+    expect(enlace.href).toBe('blob:aquachile/solicitudes')
+
+    const blob = URL.createObjectURL.mock.calls[0][0]
+    expect(blob.type).toBe('text/csv;charset=utf-8')
+    expect(await blob.text()).toContain('"Ana Pérez"')
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:aquachile/solicitudes')
   })
 })
