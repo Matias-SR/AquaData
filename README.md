@@ -102,9 +102,21 @@ Las pruebas usan jsdom y no se conectan a Supabase: el formulario de postulantes
 | `src/utils/__tests__/flujo.test.js` | Qué se puede editar y cuál es la siguiente acción del evaluador en cada etapa |
 | `src/utils/__tests__/indicadores.test.js` | Días entre fechas, promedio hasta el informe y conteos para el dashboard |
 | `src/utils/__tests__/estados.test.js` | Formato de fecha, competencias, plantillas por familia de cargo e informe en blanco |
-| `src/utils/__tests__/exportarCsv.test.js` | CSV con comas, punto y coma y comillas en los datos |
-| `src/components/__tests__/*.test.jsx` | `EstadoBadge`, `StatCard` y `EmptyState` según sus props |
+| `src/utils/__tests__/exportarCsv.test.js` | CSV con comas, punto y coma y comillas en los datos, y descarga del archivo |
+| `src/components/__tests__/EstadoBadge`, `StatCard`, `EmptyState`, `Barras` | Componentes de presentación según sus props |
+| `src/components/__tests__/RolBanner.test.jsx` | Resumen del rol, cierre recordado en la sesión |
+| `src/components/__tests__/TablaSolicitudes.test.jsx` | Una fila por solicitud, estado vacío, columna opcional y enlace al detalle |
+| `src/components/__tests__/AlertaTemporal.test.jsx` | Cierre automático, cierre con la X y scroll hasta el mensaje |
+| `src/components/__tests__/AppLayout.test.jsx` | Menú móvil: fondo, Escape, cierre al navegar y opciones según rol |
+| `src/components/__tests__/ProtectedRoute.test.jsx` | Acceso a `/candidatos` según rol, login y carga de sesión |
 | `src/pages/__tests__/CandidatoForm.test.jsx` | Mensajes de error con el formulario vacío, RUT inválido y registro exitoso |
+| `src/pages/__tests__/Usuarios.test.jsx` | Validación del formulario de usuarios y respuestas de la Edge Function |
+| `src/pages/__tests__/Inicio.test.jsx` | Aviso cuando la cuenta no tiene un rol válido |
+| `src/pages/__tests__/JefaturaInicio.test.jsx` | Totales, conteo por etapa, barras por evaluador, familia y resultado, y estados vacíos |
+| `src/pages/__tests__/EvaluadorInicio.test.jsx` | Bandeja con solo las solicitudes asignadas, por etapa, con hora y acción siguiente |
+| `src/pages/__tests__/AnalistaInicio.test.jsx` | Solicitudes propias, aviso de informes listos y estado vacío |
+| `src/context/__tests__/AuthContext.test.jsx` | Permisos de cada rol (`tienePermiso`) |
+| `src/context/__tests__/AuthProvider.test.jsx` | Sesión guardada, perfil inactivo, login, error de credenciales, logout y eventos de Supabase |
 
 ## Roles
 
@@ -114,7 +126,7 @@ Las pruebas usan jsdom y no se conectan a Supabase: el formulario de postulantes
 | **Profesional Evaluador** | Ver su bandeja de solicitudes asignadas, agendar y reagendar entrevistas, marcarlas como realizadas, redactar el informe (con borrador) y enviarlo o reabrirlo para corregirlo |
 | **Jefatura** | Ver los indicadores del proceso, consultar y exportar las solicitudes a CSV y administrar los usuarios (crear, editar, activar y desactivar cuentas) |
 
-Las rutas que modifican datos están protegidas por permiso (`src/components/ProtectedRoute.jsx` y `src/context/AuthContext.jsx`); en Supabase, las políticas RLS hacen la validación definitiva.
+Las rutas de postulantes y las que modifican datos están protegidas por permiso (`src/components/ProtectedRoute.jsx` y `src/context/AuthContext.jsx`). Si un rol sin permiso entra por URL, ve el aviso "No tienes acceso a esta sección". En Supabase, las políticas RLS hacen la validación definitiva.
 
 ## Flujo de una evaluación
 
@@ -139,7 +151,7 @@ Postulante registrado ─► Solicitud creada ─► Entrevista agendada ─► 
 | --- | --- | --- |
 | `/login` | `Login.jsx` | Público |
 | `/` | `Inicio.jsx` (vista según rol: `AnalistaInicio`, `EvaluadorInicio` o `JefaturaInicio`) | Usuarios con sesión |
-| `/candidatos` | `Candidatos.jsx` | Usuarios con sesión (en el menú del analista) |
+| `/candidatos` | `Candidatos.jsx` | Analista |
 | `/candidatos/nuevo` | `CandidatoForm.jsx` | Analista |
 | `/candidatos/:id/editar` | `CandidatoForm.jsx` | Analista |
 | `/solicitudes` | `Solicitudes.jsx` | Usuarios con sesión |
@@ -174,9 +186,11 @@ AquaData/
     ├── App.jsx               # Definición de rutas
     ├── setupTests.js         # Matchers de Testing Library para Vitest
     ├── assets/               # Logo e imágenes
-    ├── components/           # Componentes reutilizables (layout, badges, tarjetas, informe)
+    ├── components/           # Componentes reutilizables (layout, tabla de solicitudes, alertas, badges, tarjetas, informe)
     │   └── __tests__/
     ├── context/              # AuthContext (sesión y permisos) y DataContext (datos de Supabase)
+    │   └── __tests__/
+    ├── hooks/                # useMensajeNavegacion (mensajes de éxito entre páginas)
     ├── lib/                  # Cliente de Supabase
     ├── pages/                # Una página por ruta
     │   ├── inicio/           # Inicio según rol

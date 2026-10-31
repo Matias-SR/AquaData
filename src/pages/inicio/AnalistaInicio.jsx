@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Alert, Button, Table } from 'react-bootstrap'
+import { Alert, Button } from 'react-bootstrap'
 import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
-import EstadoBadge from '../../components/EstadoBadge.jsx'
 import EmptyState from '../../components/EmptyState.jsx'
-import { formatearFecha } from '../../utils/estados.js'
+import TablaSolicitudes from '../../components/TablaSolicitudes.jsx'
 
 export default function AnalistaInicio() {
   const { usuario } = useAuth()
@@ -43,41 +42,10 @@ export default function AnalistaInicio() {
         </Alert>
       )}
 
-      {mias.length === 0 ? (
-        <EmptyState titulo="Aún no has creado solicitudes">Crea la primera con el botón Nueva solicitud.</EmptyState>
-      ) : (
-        <div className="table-responsive bloque p-0">
-          <Table hover className="align-middle mb-0">
-            <thead>
-              <tr>
-                <th>Candidato</th>
-                <th>Cargo</th>
-                <th>Evaluador</th>
-                <th>Solicitada</th>
-                <th>Etapa</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mias.map((s) => (
-                <tr key={s.id}>
-                  <td>
-                    <Link to={`/solicitudes/${s.id}`} className="fw-semibold">
-                      {nombre(s)}
-                    </Link>
-                  </td>
-                  <td>{s.cargo}</td>
-                  <td>{s.responsable}</td>
-                  <td>{formatearFecha(s.fechaSolicitud)}</td>
-                  <td>
-                    <EstadoBadge estado={s.estado} />
-                    {s.estado === 'Informe enviado' && s.informeRecibido && <span className="small text-secondary ms-2">recibido</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-      )}
+      <TablaSolicitudes
+        solicitudes={mias}
+        vacio={<EmptyState titulo="Aún no has creado solicitudes">Crea la primera con el botón Nueva solicitud.</EmptyState>}
+      />
     </>
   )
 }
