@@ -1,0 +1,148 @@
+:root {
+  --fiordo: #12303f;
+  --fiordo-2: #1b4356;
+  --mar: #1f6f8b;
+  --espuma: #eef3f5;
+  --salmon: #f0776b;
+  --kelp: #3e7c5b;
+  --texto: #1c2b33;
+
+  --bs-primary: var(--mar);
+  --bs-primary-rgb: 31, 111, 139;
+  --bs-link-color: var(--mar);
+  --bs-link-color-rgb: 31, 111, 139;
+  --bs-link-hover-color: var(--fiordo);
+  --bs-body-font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bs-body-color: var(--texto);
+  --bs-border-radius: 0.5rem;
+}
+
+body { background: var(--espuma); }
+
+.btn-primary {
+  --bs-btn-bg: var(--mar);
+  --bs-btn-border-color: var(--mar);
+  --bs-btn-hover-bg: var(--fiordo-2);
+  --bs-btn-hover-border-color: var(--fiordo-2);
+  --bs-btn-active-bg: var(--fiordo);
+  --bs-btn-active-border-color: var(--fiordo);
+  --bs-btn-disabled-bg: var(--mar);
+  --bs-btn-disabled-border-color: var(--mar);
+}
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+  border-color: var(--mar);
+  box-shadow: 0 0 0 0.2rem rgba(31, 111, 139, 0.2);
+}
+.form-check-input:checked { background-color: var(--mar); border-color: var(--mar); }
+
+/* ---------- Estructura ---------- */
+.app-shell { min-height: 100vh; }
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: 250px; z-index: 1030;
+  background: var(--fiordo); color: #fff;
+  display: flex; flex-direction: column; padding: 1.5rem 1.25rem;
+  transform: translateX(-100%); transition: transform 0.2s ease;
+}
+.sidebar.open { transform: translateX(0); }
+.sidebar-marca { margin-bottom: 2rem; }
+.marca-nombre { display: block; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.01em; }
+.marca-sub { display: block; font-size: 0.85rem; opacity: 0.7; }
+
+/* ---------- Logo ---------- */
+.logo-aquachile { display: block; width: auto; max-width: 100%; object-fit: contain; }
+.logo-aquachile--oscuro { filter: brightness(0); }
+.marca-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  max-width: 100%;
+}
+.sidebar-marca .marca-logo { margin-bottom: 0.65rem; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
+.sidebar-link {
+  color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem; border-left: 3px solid transparent;
+}
+.sidebar-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.sidebar-link.activo { background: rgba(255, 255, 255, 0.12); color: #fff; border-left-color: var(--salmon); font-weight: 600; }
+.sidebar-pie { border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 1rem; }
+.topbar {
+  position: sticky; top: 0; z-index: 1020; background: var(--fiordo); color: #fff;
+  display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem;
+}
+.contenido { padding: 1.5rem 1rem 3rem; max-width: 1200px; }
+@media (min-width: 992px) {
+  .sidebar { transform: none; }
+  .contenido { margin-left: 250px; padding: 2rem 2.5rem 3rem; }
+}
+
+/* ---------- Bloques ---------- */
+.bloque { background: #fff; border: 1px solid #dbe4e8; border-radius: 0.75rem; padding: 1.25rem; }
+.bloque.p-0 { padding: 0; overflow: hidden; }
+.table > :not(caption) > * > * { padding: 0.8rem 1rem; }
+.table thead th { font-weight: 600; font-size: 0.85rem; color: #5b6b73; background: #f7fafb; white-space: nowrap; }
+.empty-state { background: #fff; border: 1px dashed #b9c8ce; border-radius: 0.75rem; padding: 2rem; text-align: center; }
+
+/* ---------- Indicadores ---------- */
+.stat { background: #fff; border: 1px solid #dbe4e8; border-radius: 0.75rem; padding: 1rem 1.25rem; }
+.stat-valor { font-size: 2rem; font-weight: 700; line-height: 1.1; color: var(--fiordo); }
+.stat-titulo { color: #5b6b73; font-size: 0.9rem; }
+.stat-detalle { font-size: 0.8rem; color: #7b8a91; }
+
+.barra-fila { display: grid; grid-template-columns: 140px 1fr 28px; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+.barra-etiqueta { font-size: 0.9rem; }
+.barra-pista { background: #e5edf0; border-radius: 999px; height: 10px; overflow: hidden; }
+.barra-relleno { background: var(--mar); height: 100%; border-radius: 999px; }
+.barra-valor { text-align: right; font-weight: 600; }
+@media (max-width: 480px) { .barra-fila { grid-template-columns: 100px 1fr 24px; } }
+
+/* ---------- Etapas ---------- */
+.estado-badge { display: inline-block; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.estado-recibida { background: #fde4e1; color: #a2372c; }
+.estado-agendada { background: #dcecf3; color: #1a5a72; }
+.estado-realizada { background: #f5ecd0; color: #7a5a06; }
+.estado-enviado { background: #dcefe4; color: #276244; }
+
+.etapas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.etapas li { border-top: 4px solid #cfdadf; padding-top: 0.5rem; font-size: 0.85rem; color: #7b8a91; }
+.etapas li.hecha { border-top-color: var(--kelp); color: var(--kelp); }
+.etapas li.actual { border-top-color: var(--salmon); color: var(--texto); font-weight: 700; }
+@media (max-width: 575px) { .etapas { grid-template-columns: repeat(2, 1fr); } }
+
+.datos dt { font-size: 0.8rem; color: #7b8a91; font-weight: 500; margin-top: 0.75rem; }
+.datos dt:first-child { margin-top: 0; }
+.datos dd { margin: 0; }
+
+/* ---------- Login ---------- */
+.login-pagina { min-height: 100vh; display: grid; place-items: center; padding: 1rem; background: linear-gradient(160deg, var(--fiordo) 0%, var(--fiordo-2) 100%); }
+.login-panel { background: #fff; border-radius: 1rem; padding: 2rem; width: 100%; max-width: 420px; }
+.login-marca { display: flex; justify-content: center; margin-bottom: 1.25rem; }
+
+:focus-visible { outline: 3px solid var(--salmon); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .sidebar { transition: none; } }
+
+/* ---------- Rol y carpeta ---------- */
+.rol-banner { background: #fff; border: 1px solid #dbe4e8; border-left: 4px solid var(--salmon); border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+.carpeta-aviso { background: #eaf3f6; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9rem; }
+.carpeta { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+.carpeta li { padding: 0.35rem 0.6rem; border: 1px solid #dbe4e8; border-radius: 0.4rem; margin-bottom: 0.4rem; background: #f7fafb; }
+
+/* ---------- Tablero del evaluador ---------- */
+.tablero { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 768px) { .tablero { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .tablero { grid-template-columns: repeat(4, 1fr); } }
+.columna { background: #e4ecef; border-radius: 0.75rem; padding: 0.75rem; }
+.columna-titulo { font-size: 0.9rem; font-weight: 700; margin: 0 0 0.75rem; padding: 0.35rem 0.6rem; border-radius: 0.4rem; display: flex; justify-content: space-between; }
+.columna-cuenta { font-weight: 600; opacity: 0.8; }
+.tarjeta { display: flex; flex-direction: column; gap: 0.2rem; background: #fff; border: 1px solid #dbe4e8; border-radius: 0.6rem; padding: 0.75rem; margin-bottom: 0.6rem; color: var(--texto); text-decoration: none; }
+.tarjeta:hover { border-color: var(--mar); }
+.tarjeta-accion { margin-top: 0.25rem; font-size: 0.85rem; font-weight: 600; color: var(--mar); }
+
+/* ---------- Informe ---------- */
+.informe-seccion { border: 0; border-top: 1px solid #e1e9ec; padding: 1rem 0 0.25rem; margin: 0.75rem 0 0; min-width: 0; }
+.informe-seccion legend { float: none; width: auto; padding: 0; margin-bottom: 0.75rem; }
+
+@media print {
+  .sidebar, .topbar, .no-imprimir, .etapas, .rol-banner, .alert, .btn { display: none !important; }
+  .contenido { margin: 0 !important; padding: 0 !important; max-width: none; }
+  .bloque { border: 0; }
+  body { background: #fff; }
+}

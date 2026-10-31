@@ -1,0 +1,190 @@
+INDEX.HTML
+
+ STYLES.CSS
+
+ APP.JS <----
+
+
+CODEPEN
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi primera página con JS</title>
+    <!-- index.html -->
+</head>
+<body>
+    <h1 style="margin-t">Hola Mundo</h1>
+	<button id='btn-1' onclick="alert('HOLA')"> Haz Click </button>
+
+    <script app.js ></script>
+</body>
+</html>
+
+
+# Variables // Tipos de datos
+
+
+
+let y const
+
+let nombre = "Alexis"  // string
+let edad = 35 // number
+let esEstudiante = false //  boolean
+undefined  = undefined // variable sin valor
+null = null  // valor vacio
+
+const PI = 3.14159
+const pi =
+
+let a = 10
+let b = 20
+
+console.log(a + b)
+a + b => 30
+
+let nombre = "alexis"
+let saludar = `Hola, ${nombre}`
+
+console.log(saludar) => // Hola alexis!
+
+
+# condicionales
+
+if, else if, else
+
+1 == "1" // tue
+1 > 1 // false
+1 < 1 // false
+1 === "1" //false 🔥
+1 !== 1
+
+
+# functions
+
+function saludar(nombre) {
+	console.log("HOLA ${nombre}")
+}
+
+function sumar(a, b){
+  return a + b
+}
+
+const resultado  = sumar(13, 40)
+let resultados = resultado + resultado
+console.log(resultado)
+
+
+
+
+const sumando = (a, b) => a + b  // arrow functions
+console.log(sumando(13, 40))
+
+
+
+// Ciclos
+
+for, while
+
+array = [1, 2, 3, 4, 5, 6, 7]
+
+for(let i = 1; i => array.length ; i++) {
+	console.log('Numero ${i}')
+}
+
+// for(inicio, condicional, incremento)
+
+
+// While
+
+let contador = 1
+
+while (contador <= 5) {
+	console.log('Contador: ${contador}')
+	contador++
+}
+
+let notas = [1, 2, 3, 4, 5, 6, 7]
+
+notas.forEach(function(nota, indice)) {
+	console.log('Notas ${nota}')
+}
+
+// comentar contenido
+
+
+
+Crear un archivo index.html y un app.js.
+Conectarlos y mostrar un mensaje con alert()
+y otro con console.log(`hola ${asd}`).
+
+
+Crear variables con datos personales (nombre, edad, carrera)
+ mostrarlas en consola.
+
+
+Crear un programa que clasifique una nota en:
+"Excelente" (90+), "Bueno" (70-89), "Suficiente" (60-69),
+"Reprobado" (<60).
+
+``
+
+let nota = 70
+
+	if (nota >= 90) {
+		console.log("excelente")
+	} else if (nota == 70 && <= 89) {
+
+	} else if () {
+
+	} else {
+
+	}
+}
+
+
+
+// POR QUE EXISTE REACT ?
+//
+//
+// HTML
+// <button id="btn-primary"> HOLA </button>
+// <h1 id="saludos"> qweasdzxcasdqwe </h1>
+
+
+// JS  Vanilla
+// const element = document.getElementById("btn-primary")
+// element.textContent = "CHAO"
+// document.createElement("div")
+
+
+function saludosVanilla() {
+  let nombre = "Carlos "
+  let elemento = document.getElementById("saludos")
+  elemento.textContat = "Hola, " + nombre + "!"
+}
+
+// <h1 id="saludos"> Hola, Carlos !</h1>
+//
+//
+// <div id="root"></div>
+
+function Saludo(){
+  const nombre = "Carlos";
+  return <h1> Hola, {nombre}! </h1>
+}
+
+
+
+npx create-vite@latest aquachileProject --template react
+npm run dev
+//
+//
+//
+//
+// Crear una función componente llamada
+// BotonAccion que contenga un <h1> y un <button>,
+// y usarla dentro de <App />.
