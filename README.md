@@ -172,6 +172,17 @@ Postulante registrado ─► Solicitud creada ─► Entrevista agendada ─► 
 - **Plantillas por familia de cargo.** Los nombres de archivo y las competencias de cada familia son una propuesta para el MVP (`src/utils/estados.js`) y deben validarse con el área de Selección.
 - **Administración de usuarios.** Requiere desplegar la Edge Function `usuarios` ([`docs/ADMINISTRACION_USUARIOS.md`](docs/ADMINISTRACION_USUARIOS.md)). La recuperación de contraseña aún no está habilitada.
 
+## Documentación
+
+| Documento | Contenido |
+| --- | --- |
+| [`docs/ERS_AquaData.md`](docs/ERS_AquaData.md) | Especificación de requisitos: alcance, requisitos funcionales y no funcionales, pendientes y correspondencia con AquaChile |
+| [`docs/EVIDENCIA_PRUEBAS.md`](docs/EVIDENCIA_PRUEBAS.md) | Pruebas Vitest, cobertura, pruebas manuales y capturas |
+| [`docs/INTEGRACION_GOOGLE_FORMS.md`](docs/INTEGRACION_GOOGLE_FORMS.md) | Postulación externa Google Forms → Drive → Supabase |
+| [`docs/INTEGRACION_GOOGLE_DRIVE.md`](docs/INTEGRACION_GOOGLE_DRIVE.md) | Apertura de documentos desde Drive (pendiente) |
+| [`docs/ADMINISTRACION_USUARIOS.md`](docs/ADMINISTRACION_USUARIOS.md) | Edge Function de administración de usuarios |
+| [`README_SUPABASE.md`](README_SUPABASE.md) | Configuración de Supabase |
+
 ## Estructura de carpetas
 
 ```text
