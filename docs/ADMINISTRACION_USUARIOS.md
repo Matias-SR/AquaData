@@ -17,7 +17,7 @@ Desde la carpeta raíz del proyecto, con Supabase CLI instalado y el proyecto vi
 
 ```bash
 supabase login
-supabase link --project-ref tcizmravpkvrejlhwiur
+supabase link --project-ref <project-ref>
 supabase functions deploy usuarios
 ```
 
