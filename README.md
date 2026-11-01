@@ -26,6 +26,7 @@ El área de Selección de AquaChile gestiona las evaluaciones psicolaborales con
 - Bandeja del evaluador organizada por etapa, al estilo del tablero Planner que se usa hoy.
 - Indicadores para Jefatura: solicitudes por etapa, carga por evaluador, familias de cargo, resultados y días promedio hasta el informe.
 - Búsqueda y filtros de postulantes y solicitudes, y exportación del listado a CSV.
+- Postulación externa por Google Forms (implementado): Apps Script guarda el CV y un PDF del formulario en una carpeta privada de Drive y registra al postulante en Supabase. La ubicación la completa el analista al editar el postulante. Ver [`docs/INTEGRACION_GOOGLE_FORMS.md`](docs/INTEGRACION_GOOGLE_FORMS.md).
 - Administración de usuarios internos (Jefatura).
 - Inicio de sesión con Supabase Auth y permisos por rol.
 
@@ -167,8 +168,7 @@ Postulante registrado ─► Solicitud creada ─► Entrevista agendada ─► 
 
 ## Qué está simulado o pendiente
 
-- **CV y documentos en Google Drive.** La carpeta del postulante, la plantilla de informe y la pauta de entrevista se muestran por nombre, pero los archivos aún no se abren. Ya existen la capa de servicio (`src/services/googleDriveService.js`) y la Edge Function `google-drive`, que responde *501* hasta que se configuren las credenciales del servidor. Detalle en [`docs/INTEGRACION_GOOGLE_DRIVE.md`](docs/INTEGRACION_GOOGLE_DRIVE.md).
-- **Postulación por Google Forms.** El Apps Script (`google-apps-script/Code.gs`) y la Edge Function `registrar-postulacion` están preparados, pero falta crear el formulario y la carpeta raíz desde la cuenta de AquaChile. Ver [`docs/INTEGRACION_GOOGLE_FORMS.md`](docs/INTEGRACION_GOOGLE_FORMS.md).
+- **Ver el CV desde la app (Google Drive).** Las postulaciones por Google Forms ya guardan el CV y el PDF en Drive (ver *Alcance del MVP*), pero la app todavía no abre esos archivos: el CV, la plantilla de informe y la pauta de entrevista se muestran por nombre. Ya existen la capa de servicio (`src/services/googleDriveService.js`) y la Edge Function `google-drive`, que responde *501* hasta que se configuren las credenciales del servidor. Detalle en [`docs/INTEGRACION_GOOGLE_DRIVE.md`](docs/INTEGRACION_GOOGLE_DRIVE.md).
 - **Plantillas por familia de cargo.** Los nombres de archivo y las competencias de cada familia son una propuesta para el MVP (`src/utils/estados.js`) y deben validarse con el área de Selección.
 - **Administración de usuarios.** Requiere desplegar la Edge Function `usuarios` ([`docs/ADMINISTRACION_USUARIOS.md`](docs/ADMINISTRACION_USUARIOS.md)). La recuperación de contraseña aún no está habilitada.
 

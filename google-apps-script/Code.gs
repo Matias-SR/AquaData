@@ -1,3 +1,12 @@
+// Proyecto independiente de Apps Script (script.google.com), no vinculado al formulario.
+// Reemplaza el valor por el ID del formulario: la parte de la URL de edición entre /d/ y /edit.
+// No subas el ID real al repositorio.
+const FORM_ID = 'REEMPLAZAR_CON_ID_DEL_FORMULARIO'
+
+function obtenerFormulario() {
+  return FormApp.openById(FORM_ID)
+}
+
 // Configura los títulos de las preguntas para que coincidan exactamente con Google Forms.
 const CAMPOS = {
   nombre: 'Nombre completo',
@@ -9,8 +18,62 @@ const CAMPOS = {
   cv: 'Currículum Vitae',
 }
 
+const CARGOS = [
+  'Operario/a de Planta',
+  'Operador/a de Grúa Horquilla',
+  'Técnico/a en Mantención',
+  'Técnico/a en Acuicultura',
+  'Supervisor/a de Turno',
+  'Analista de Calidad',
+  'Ingeniero/a de Procesos',
+  'Jefe/a de Producción',
+]
+
+// Debe coincidir con FAMILIAS_CARGO de src/utils/estados.js.
+const FAMILIAS = [
+  'Operario Calificado',
+  'Técnico A',
+  'Técnico B C',
+  'Supervisor B',
+  'Jefatura',
+  'Profesional A',
+  'Profesional B C',
+]
+
+// Crea las preguntas obligatorias que falten. La pregunta "Currículum Vitae" (carga de archivo)
+// se crea a mano en Forms porque la API de FormApp no permite crearla; aquí solo se mueve al final.
+function crearPreguntas() {
+  const form = obtenerFormulario()
+  const existe = (titulo) => form.getItems().some((item) => item.getTitle() === titulo)
+
+  const textos = [CAMPOS.nombre, CAMPOS.rut, CAMPOS.correo, CAMPOS.telefono]
+  textos.forEach((titulo) => {
+    if (existe(titulo)) return
+    const pregunta = form.addTextItem().setTitle(titulo).setRequired(true)
+    if (titulo === CAMPOS.correo) {
+      pregunta.setValidation(FormApp.createTextValidation()
+        .setHelpText('Ingresa un correo válido, por ejemplo nombre@correo.cl.')
+        .requireTextIsEmail()
+        .build())
+    }
+  })
+
+  const listas = [[CAMPOS.cargo, CARGOS], [CAMPOS.familia, FAMILIAS]]
+  listas.forEach(([titulo, opciones]) => {
+    if (existe(titulo)) return
+    form.addListItem().setTitle(titulo).setChoiceValues(opciones).setRequired(true)
+  })
+
+  const cv = form.getItems().find((item) => item.getTitle() === CAMPOS.cv)
+  if (cv) {
+    form.moveItem(cv, form.getItems().length - 1)
+  } else {
+    Logger.log(`Falta la pregunta "${CAMPOS.cv}". Créala a mano en Forms como carga de archivo obligatoria y vuelve a ejecutar crearPreguntas.`)
+  }
+}
+
 function instalarActivador() {
-  const form = FormApp.getActiveForm()
+  const form = obtenerFormulario()
   ScriptApp.getProjectTriggers()
     .filter((trigger) => trigger.getHandlerFunction() === 'alEnviarPostulacion')
     .forEach((trigger) => ScriptApp.deleteTrigger(trigger))

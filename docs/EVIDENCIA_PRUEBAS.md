@@ -92,19 +92,22 @@ Por carpeta:
 | --- | --- |
 | Estilos CSS y diseño responsive | jsdom no calcula diseño ni medidas. Se probaron manualmente en el navegador a 375 px. |
 | `SolicitudDetalle.jsx`, `Solicitudes.jsx`, `SolicitudForm.jsx`, `Candidatos.jsx`, `Login.jsx`, `InformeEditor.jsx`, `InformeVista.jsx`, `DataContext.jsx` | Sin pruebas automatizadas propias. Sus reglas (validaciones, flujo, permisos, informe por competencias) están probadas en `utils` y `context`, y las pantallas se verificaron manualmente con los 3 roles. |
-| `Usuarios.jsx`: editar y activar/desactivar | Solo está probada la creación (65,74 % statements). Edición y activación se verificaron manualmente. |
-| Integración con Google Drive y Google Forms | Pendientes: la función de Drive responde 501 hasta configurar el servidor. Ver `docs/INTEGRACION_GOOGLE_DRIVE.md` y `docs/INTEGRACION_GOOGLE_FORMS.md`. |
+| `Usuarios.jsx`: editar y activar/desactivar | Solo está probada la creación (65,74 % statements). Edición y activación quedan pendientes de prueba manual (no se probaron para no alterar las cuentas reales del equipo). |
+| Integración Google Forms (`Code.gs` y Edge Function `registrar-postulacion`) | Implementada. No tiene pruebas automatizadas porque corre en Apps Script y en Supabase, fuera de Vitest; se probó de punta a punta (sección 6). Ver `docs/INTEGRACION_GOOGLE_FORMS.md`. |
+| Ver el CV desde la app (Google Drive) | Pendiente: la función `google-drive` responde 501 hasta configurar las credenciales del servidor. Ver `docs/INTEGRACION_GOOGLE_DRIVE.md`. |
 
 ## 6. Pruebas manuales en navegador
 
 | Prueba | Qué se verificó |
 | --- | --- |
-| Flujo completo con los 3 roles | Analista registra postulante y crea solicitud → Evaluador agenda, registra entrevista y envía informe → Analista marca el informe como recibido → Jefatura ve los indicadores y exporta |
-| Validaciones | RUT inválido, correo y celular mal escritos, campos obligatorios, fechas anteriores a la solicitud, informe incompleto |
-| Mensajes de éxito y error | Confirmaciones al guardar y errores visibles junto al formulario |
-| Permisos por URL | Evaluador y Jefatura reciben "No tienes acceso" al escribir rutas de otro rol |
-| Responsive a 375 px | Tablas, menú lateral móvil (fondo, Escape, cierre al navegar) y formularios |
-| Datos de demostración | `supabase/seed_demo.sql` en el SQL Editor: 3 solicitudes en Evaluación recibida, 2 en Entrevista agendada, 2 en Entrevista realizada y 3 en Informe enviado (Recomendado, Recomendado con observaciones y No recomendado) |
+| Flujo completo con los 3 roles | Analista registra y edita postulante, y crea solicitud → Evaluador agenda entrevista, la marca como realizada, guarda borrador, envía informe, lo reabre y lo reenvía → Jefatura ve los indicadores actualizados (10 solicitudes, 7 en curso, 3 informes, 8,3 días promedio). "Marcar informe como recibido" por el Analista queda pendiente de prueba manual. |
+| Validaciones | RUT con dígito verificador incorrecto, correo sin @, teléfono vacío, campos obligatorios (incluidos Ubicación y Origen), entrevista sin hora, informe con competencias incompletas y conclusión corta, crear usuario vacío y con correo inválido |
+| Mensajes | Éxito al editar postulante (se cierra solo), un solo mensaje al guardar borrador, scroll a la confirmación al enviar informe, mensaje al reabrir informe |
+| Permisos por URL | Evaluador y Jefatura ven "No tienes acceso" en `/candidatos` y `/solicitudes/nueva` |
+| Exportar CSV (Jefatura) | Descarga `solicitudes.csv` con encabezado + 10 filas, separador `;` y tildes correctas |
+| Responsive a 375 px | Tablas con scroll horizontal, menú lateral con fondo (cierre con fondo, Escape y al navegar), bandeja kanban apilada, barra de etapas en 2x2; ningún elemento se sale de la pantalla |
+| Datos de demostración | `supabase/seed_demo.sql` ejecutado en el SQL Editor |
+| Integración Google Forms (01-11-2026) | Postulación enviada desde el formulario: se creó la carpeta del postulante en Drive con el CV y `Formulario_Postulacion.pdf`, y el registro llegó a `public.postulantes` con origen Externo (los datos de la prueba se eliminaron después) |
 
 ## 7. Evidencia
 
