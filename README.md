@@ -98,6 +98,8 @@ La configuración de la base de datos (migración, perfiles y políticas RLS) es
 
 Las pruebas usan jsdom y no se conectan a Supabase: el formulario de postulantes se prueba con el contexto de datos simulado.
 
+Resultados, cobertura, justificación de los escenarios y capturas: [`docs/EVIDENCIA_PRUEBAS.md`](docs/EVIDENCIA_PRUEBAS.md).
+
 | Archivo | Qué comprueba |
 | --- | --- |
 | `src/utils/__tests__/validaciones.test.js` | RUT (con y sin puntos, dígito verificador, K), postulante, solicitud, entrevista e informe |
