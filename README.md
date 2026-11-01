@@ -69,7 +69,9 @@ El área de Selección de AquaChile gestiona las evaluaciones psicolaborales con
 
    Completa `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` con los valores de **Supabase → Project Settings → API** (URL del proyecto y *publishable/anon key*). Nunca uses la clave `service_role` en el frontend. El archivo `.env` está en `.gitignore` y no se sube al repositorio.
 
-4. Levanta el servidor de desarrollo:
+4. *(Opcional)* Cargar datos de demostración: en **Supabase → SQL Editor** ejecuta el contenido de [`supabase/seed_demo.sql`](supabase/seed_demo.sql). Crea 10 postulantes y 10 solicitudes 100% ficticios repartidos en las 4 etapas, con 3 informes enviados. Requiere la migración aplicada y los perfiles `analista@aquadata.cl` y `evaluador@aquadata.cl` creados. Se puede ejecutar varias veces: al inicio solo borra los registros con correo `@ejemplo.cl` (y sus solicitudes, evaluaciones e historial); no toca ningún otro dato.
+
+5. Levanta el servidor de desarrollo:
 
    ```bash
    npm run dev
@@ -77,7 +79,7 @@ El área de Selección de AquaChile gestiona las evaluaciones psicolaborales con
 
    Abre la URL que muestra la terminal (por defecto `http://localhost:5173`).
 
-5. Para generar la versión de producción:
+6. Para generar la versión de producción:
 
    ```bash
    npm run build
