@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
-import { ESTADOS, ESTADO_CLASE, formatearFecha } from '../../utils/estados.js'
+import { ESTADOS, ESTADO_CLASE, formatearFecha, formatearHora } from '../../utils/estados.js'
 import { siguienteAccionEvaluador } from '../../utils/flujo.js'
 
 // Tablero por etapa, igual al Planner que usan hoy, pero solo con las solicitudes asignadas al evaluador.
@@ -37,7 +37,7 @@ export default function EvaluadorInicio() {
                   <span className="small text-secondary">{s.cargo}</span>
                   {s.entrevista && s.estado === 'Entrevista agendada' && (
                     <span className="small">
-                      Entrevista: {formatearFecha(s.entrevista.fecha)} · {s.entrevista.hora}
+                      Entrevista: {formatearFecha(s.entrevista.fecha)} · {formatearHora(s.entrevista.hora)}
                     </span>
                   )}
                   <span className="tarjeta-accion">{siguienteAccionEvaluador(s.estado)}</span>

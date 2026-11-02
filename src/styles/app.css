@@ -41,9 +41,13 @@ body { background: var(--espuma); }
   position: fixed; inset: 0 auto 0 0; width: 250px; z-index: 1030;
   background: var(--fiordo); color: #fff;
   display: flex; flex-direction: column; padding: 1.5rem 1.25rem;
-  transform: translateX(-100%); transition: transform 0.2s ease;
+  transform: translateX(-100%); visibility: hidden;
+  /* visibility evita que el teclado entre a los enlaces del menú mientras está oculto. */
+  transition: transform 0.2s ease, visibility 0s linear 0.2s;
 }
-.sidebar.open { transform: translateX(0); }
+.sidebar.open { transform: translateX(0); visibility: visible; transition: transform 0.2s ease; }
+.sidebar-cerrar { position: absolute; top: 1rem; right: 1rem; }
+.sidebar-fondo { position: fixed; inset: 0; z-index: 1025; background: rgba(18, 48, 63, 0.55); }
 .sidebar-marca { margin-bottom: 2rem; }
 .marca-nombre { display: block; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.01em; }
 .marca-sub { display: block; font-size: 0.85rem; opacity: 0.7; }
@@ -70,13 +74,16 @@ body { background: var(--espuma); }
 }
 .contenido { padding: 1.5rem 1rem 3rem; max-width: 1200px; }
 @media (min-width: 992px) {
-  .sidebar { transform: none; }
+  .sidebar { transform: none; visibility: visible; }
   .contenido { margin-left: 250px; padding: 2rem 2.5rem 3rem; }
 }
 
 /* ---------- Bloques ---------- */
 .bloque { background: #fff; border: 1px solid #dbe4e8; border-radius: 0.75rem; padding: 1.25rem; }
 .bloque.p-0 { padding: 0; overflow: hidden; }
+/* La tabla necesita scroll horizontal en móvil; overflow auto también recorta en las esquinas redondeadas. */
+.bloque.table-responsive { overflow-x: auto; }
+@media (max-width: 767.98px) { .table-responsive > .table td { white-space: nowrap; } }
 .table > :not(caption) > * > * { padding: 0.8rem 1rem; }
 .table thead th { font-weight: 600; font-size: 0.85rem; color: #5b6b73; background: #f7fafb; white-space: nowrap; }
 .empty-state { background: #fff; border: 1px dashed #b9c8ce; border-radius: 0.75rem; padding: 2rem; text-align: center; }
@@ -117,7 +124,7 @@ body { background: var(--espuma); }
 .login-marca { display: flex; justify-content: center; margin-bottom: 1.25rem; }
 
 :focus-visible { outline: 3px solid var(--salmon); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .sidebar { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .sidebar, .sidebar.open { transition: none; } }
 
 /* ---------- Rol y carpeta ---------- */
 .rol-banner { background: #fff; border: 1px solid #dbe4e8; border-left: 4px solid var(--salmon); border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }

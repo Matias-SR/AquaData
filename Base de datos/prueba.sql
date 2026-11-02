@@ -1,21 +1,23 @@
+-- Datos 100% ficticios. Esquema histórico de la versión Oracle; la versión actual usa Supabase (ver supabase/migrations).
+
 -- Insertamos usuario evaluador
 
 
 INSERT INTO usuarios (nombre, email, password, rol) 
-VALUES ('Margarita Soto', 'msoto@aquachile.cl', '123456', 'Psicóloga Selección');
+VALUES ('Andrea Ejemplo', 'evaluador1@ejemplo.cl', 'hash_ficticio_no_usar', 'Psicóloga Selección');
 INSERT INTO usuarios (nombre, email, password, rol) 
-VALUES ('Maximiliano Caceres', 'mcaceres@gmail.com', '123456', 'Psicologo de famosos');
+VALUES ('Pablo Ejemplo', 'evaluador2@ejemplo.cl', 'hash_ficticio_no_usar', 'Psicólogo Laboral');
 
 
 -- Insertamos candidatos iniciales
 INSERT INTO candidatos (rut, nombre, cargo_postulado, estado_evaluacion, fecha_solicitud) 
-VALUES ('15.432.111-9', 'Juan Pérez', 'Operador de Planta', 'Apto', TO_DATE('2026-09-20', 'YYYY-MM-DD'));
+VALUES ('11.111.111-1', 'Juan Pérez', 'Operador de Planta', 'Apto', TO_DATE('2026-09-20', 'YYYY-MM-DD'));
 
 INSERT INTO candidatos (rut, nombre, cargo_postulado, estado_evaluacion, fecha_solicitud) 
-VALUES ('18.765.432-1', 'María González', 'Jefa de Turno', 'Pendiente', TO_DATE('2026-09-22', 'YYYY-MM-DD'));
+VALUES ('22.222.222-2', 'María González', 'Jefa de Turno', 'Pendiente', TO_DATE('2026-09-22', 'YYYY-MM-DD'));
 
 INSERT INTO candidatos (rut, nombre, cargo_postulado, estado_evaluacion, fecha_solicitud) 
-VALUES ('12.987.654-K', 'Carlos Silva', 'Técnico Mantenimiento', 'No Apto', TO_DATE('2026-09-25', 'YYYY-MM-DD'));
+VALUES ('33.333.333-3', 'Carlos Silva', 'Técnico Mantenimiento', 'No Apto', TO_DATE('2026-09-25', 'YYYY-MM-DD'));
 
 
 COMMIT;

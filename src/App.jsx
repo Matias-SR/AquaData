@@ -25,7 +25,14 @@ export default function App() {
         }
       >
         <Route index element={<Inicio />} />
-        <Route path="candidatos" element={<Candidatos />} />
+        <Route
+          path="candidatos"
+          element={
+            <ProtectedRoute permiso="candidatos:ver">
+              <Candidatos />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="candidatos/nuevo"
           element={

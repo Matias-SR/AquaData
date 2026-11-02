@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Badge, Button, Form, Modal, Spinner, Table } from 'react-bootstrap'
 import { supabase } from '../../lib/supabaseClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { validarUsuario } from '../../utils/validaciones.js'
+import AlertaTemporal from '../../components/AlertaTemporal.jsx'
 
 const ROLES = [
   { value: 'analista', label: 'Analista de Reclutamiento' },
@@ -22,7 +24,9 @@ export default function Usuarios() {
   const [mostrar, setMostrar] = useState(false)
   const [editando, setEditando] = useState(null)
   const [form, setForm] = useState(vacio)
+  const [errores, setErrores] = useState({})
 
+  // La función responde con estado HTTP 2xx solo cuando la acción resultó; cualquier otro estado llega como invokeError.
   const llamarFuncion = async (payload) => {
     const { data, error: invokeError } = await supabase.functions.invoke('usuarios', { body: payload })
     if (invokeError) {
@@ -33,10 +37,7 @@ export default function Usuarios() {
       } catch { /* Conserva el mensaje original si la respuesta no es JSON. */ }
       throw new Error(detalle)
     }
-    if (data?.message && !data?.users && !data?.userId && !data?.message.includes('correctamente') && !data?.message.includes('activado') && !data?.message.includes('desactivado')) {
-      throw new Error(data.message)
-    }
-    return data
+    return data ?? {}
   }
 
   const cargarUsuarios = useCallback(async () => {
@@ -63,6 +64,7 @@ export default function Usuarios() {
   const abrirNuevo = () => {
     setEditando(null)
     setForm(vacio)
+    setErrores({})
     setError('')
     setMensaje('')
     setMostrar(true)
@@ -70,15 +72,27 @@ export default function Usuarios() {
   const abrirEdicion = (u) => {
     setEditando(u)
     setForm({ nombre: u.nombre ?? '', correo: u.correo ?? '', rol: u.rol, password: '' })
+    setErrores({})
     setError('')
     setMensaje('')
     setMostrar(true)
   }
-  const cerrar = () => { if (!guardando) setMostrar(false) }
-  const cambiar = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
+  const cerrar = () => {
+    if (guardando) return
+    setMostrar(false)
+    setError('')
+  }
+  const cambiar = (e) => {
+    const { name, value } = e.target
+    setForm((f) => ({ ...f, [name]: value }))
+    if (errores[name]) setErrores((actuales) => ({ ...actuales, [name]: undefined }))
+  }
 
   const guardar = async (e) => {
     e.preventDefault()
+    const nuevosErrores = validarUsuario(form, { edicion: !!editando })
+    setErrores(nuevosErrores)
+    if (Object.keys(nuevosErrores).length) return
     setGuardando(true)
     setError('')
     setMensaje('')
@@ -107,7 +121,7 @@ export default function Usuarios() {
     setMensaje('')
     try {
       const data = await llamarFuncion({ action: 'set_active', userId: u.id, activo })
-      setMensaje(data.message)
+      setMensaje(data.message ?? (activo ? 'Usuario activado.' : 'Usuario desactivado.'))
       await cargarUsuarios()
     } catch (err) {
       setError(err.message)
@@ -124,8 +138,8 @@ export default function Usuarios() {
         <Button onClick={abrirNuevo}>+ Nuevo usuario</Button>
       </div>
 
-      {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
-      {mensaje && <Alert variant="success" dismissible onClose={() => setMensaje('')}>{mensaje}</Alert>}
+      {error && !mostrar && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
+      {mensaje && <AlertaTemporal duracion={5000} onClose={() => setMensaje('')}>{mensaje}</AlertaTemporal>}
 
       <section className="bloque mb-3">
         <div className="row g-3 align-items-end">
@@ -168,26 +182,32 @@ export default function Usuarios() {
       </section>
 
       <Modal show={mostrar} onHide={cerrar} centered>
-        <Form onSubmit={guardar}>
+        <Form noValidate onSubmit={guardar}>
           <Modal.Header closeButton={!guardando}><Modal.Title>{editando ? 'Editar usuario' : 'Crear usuario'}</Modal.Title></Modal.Header>
           <Modal.Body>
-            <Form.Group className="mb-3">
+            {/* Mientras el modal está abierto, el error se muestra dentro de él; afuera quedaría tapado. */}
+            {error && <Alert variant="danger">{error}</Alert>}
+            <Form.Group className="mb-3" controlId="usuario-nombre">
               <Form.Label>Nombre completo</Form.Label>
-              <Form.Control name="nombre" value={form.nombre} onChange={cambiar} required maxLength={120} />
+              <Form.Control name="nombre" value={form.nombre} onChange={cambiar} maxLength={120} isInvalid={!!errores.nombre} />
+              <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="usuario-correo">
               <Form.Label>Correo electrónico</Form.Label>
-              <Form.Control type="email" name="correo" value={form.correo} onChange={cambiar} required />
+              <Form.Control type="email" name="correo" value={form.correo} onChange={cambiar} isInvalid={!!errores.correo} />
+              <Form.Control.Feedback type="invalid">{errores.correo}</Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="usuario-rol">
               <Form.Label>Rol del usuario</Form.Label>
-              <Form.Select name="rol" value={form.rol} onChange={cambiar}>
+              <Form.Select name="rol" value={form.rol} onChange={cambiar} isInvalid={!!errores.rol}>
                 {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">{errores.rol}</Form.Control.Feedback>
             </Form.Group>
-            {!editando && <Form.Group>
+            {!editando && <Form.Group controlId="usuario-password">
               <Form.Label>Contraseña inicial</Form.Label>
-              <Form.Control type="password" name="password" value={form.password} onChange={cambiar} minLength={8} autoComplete="new-password" required />
+              <Form.Control type="password" name="password" value={form.password} onChange={cambiar} autoComplete="new-password" isInvalid={!!errores.password} />
+              <Form.Control.Feedback type="invalid">{errores.password}</Form.Control.Feedback>
               <Form.Text>Debe tener al menos 8 caracteres. Entrégala al usuario por un canal seguro.</Form.Text>
             </Form.Group>}
             {editando && <Alert variant="info" className="mb-0">La edición no cambia la contraseña. El usuario puede recuperarla desde el flujo de recuperación cuando esté habilitado.</Alert>}

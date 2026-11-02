@@ -2,9 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient.js'
 
 const PERMISOS = {
-  analista: ['candidatos:escribir', 'solicitudes:crear', 'solicitudes:editar', 'informe:recibir'],
+  analista: ['candidatos:ver', 'candidatos:escribir', 'solicitudes:crear', 'solicitudes:editar', 'informe:recibir'],
   evaluador: ['entrevista:gestionar', 'informe:redactar'],
   jefatura: ['solicitudes:exportar', 'usuarios:administrar'],
+}
+
+export function tienePermiso(rol, permiso) {
+  return (PERMISOS[rol] ?? []).includes(permiso)
 }
 
 const ROLES = {
@@ -125,7 +129,7 @@ export function AuthProvider({ children }) {
     setUsuario(null)
   }
 
-  const can = (permiso) => !!usuario && (PERMISOS[usuario.rol] ?? []).includes(permiso)
+  const can = (permiso) => !!usuario && tienePermiso(usuario.rol, permiso)
 
   return (
     <AuthContext.Provider value={{

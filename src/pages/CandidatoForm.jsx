@@ -35,7 +35,10 @@ export default function CandidatoForm() {
     try {
       if (existente) await actualizarCandidato(existente.id, datos)
       else await agregarCandidato(datos)
-      navigate('/candidatos')
+      const mensaje = existente
+        ? `Se actualizaron los datos de ${datos.nombre.trim()}.`
+        : `Postulante ${datos.nombre.trim()} registrado correctamente.`
+      navigate('/candidatos', { state: { mensaje } })
     } catch (error) {
       setErrorGeneral(error.message || 'No fue posible guardar el postulante.')
     } finally {

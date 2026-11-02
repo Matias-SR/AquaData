@@ -46,6 +46,13 @@ export function formatearFecha(iso) {
   })
 }
 
+// Postgres entrega las horas como HH:MM:SS; en pantalla se muestran como HH:MM.
+export function formatearHora(hora) {
+  const partes = /^(\d{1,2}):(\d{2})/.exec(String(hora ?? ''))
+  if (!partes) return '—'
+  return `${partes[1].padStart(2, '0')}:${partes[2]}`
+}
+
 export function hoyISO() {
   const d = new Date()
   const mes = String(d.getMonth() + 1).padStart(2, '0')
