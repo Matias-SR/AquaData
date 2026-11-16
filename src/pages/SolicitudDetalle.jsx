@@ -11,6 +11,8 @@ import { ESTADOS, formatearFecha, formatearHora, hoyISO } from '../utils/estados
 import { puedeEditarSolicitud } from '../utils/flujo.js'
 import { validarEntrevista } from '../utils/validaciones.js'
 import { useMensajeNavegacion } from '../hooks/useMensajeNavegacion.js'
+import { notificarInformeEnviado } from '../services/resendService.js'
+import { generarInformePdf } from '../utils/informePdf.js'
 
 const exito = (texto) => ({ variant: 'success', texto })
 const fallo = (texto) => ({ variant: 'danger', texto })
@@ -62,6 +64,22 @@ export default function SolicitudDetalle() {
   const enviarInforme = async (informe) => {
     await actualizarSolicitud(solicitud.id, { informe, estado: 'Informe enviado', fechaEnvio: hoyISO(), informeRecibido: false })
     setMensaje(exito('Informe enviado al analista.'))
+  }
+
+  const notificarAnalista = async () => {
+    try {
+      const adjunto = await generarInformePdf({ informe: solicitud.informe, candidato, solicitud })
+      await notificarInformeEnviado({
+        adjunto,
+        analista: solicitud.creadaPor,
+        correoAnalista: solicitud.creadaPorCorreo,
+        candidato: candidato?.nombre ?? 'Candidato',
+        cargo: solicitud.cargo,
+        evaluador: solicitud.responsable,
+        fechaEnvio: formatearFecha(solicitud.fechaEnvio),
+      })
+      setMensaje(exito('Aviso enviado por correo al analista, con el informe en PDF adjunto.'))
+    } catch (error) { setMensaje(fallo(`No fue posible enviar el correo: ${error.message}`)) }
   }
 
   const reabrirInforme = async () => {
@@ -124,9 +142,12 @@ export default function SolicitudDetalle() {
       return (
         <>
           <p className="mb-3">El informe fue enviado el {formatearFecha(solicitud.fechaEnvio)}. Si detectas un error, puedes reabrirlo.</p>
-          <Button variant="outline-secondary" onClick={reabrirInforme}>
-            Reabrir informe para corregir
-          </Button>
+          <div className="d-flex flex-wrap gap-2">
+            <Button onClick={notificarAnalista}>Notificar al analista por correo</Button>
+            <Button variant="outline-secondary" onClick={reabrirInforme}>
+              Reabrir informe para corregir
+            </Button>
+          </div>
         </>
       )
     }

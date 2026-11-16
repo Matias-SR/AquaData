@@ -59,6 +59,7 @@ function mapSolicitud(row, perfiles, evaluaciones) {
     responsable: evaluador?.nombre ?? 'Evaluador asignado',
     creadaPorId: row.analista_id,
     creadaPor: analista?.nombre ?? 'Analista',
+    creadaPorCorreo: analista?.correo ?? '',
     fechaSolicitud: fechaCorta(row.created_at),
     estado: row.estado,
     observaciones: row.observaciones ?? '',
