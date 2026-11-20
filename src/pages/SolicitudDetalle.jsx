@@ -13,6 +13,7 @@ import { validarEntrevista } from '../utils/validaciones.js'
 import { useMensajeNavegacion } from '../hooks/useMensajeNavegacion.js'
 import { notificarInformeEnviado } from '../services/resendService.js'
 import { generarInformePdf } from '../utils/informePdf.js'
+import { agendarCita } from '../services/googleCalendarService.jsx'
 
 const exito = (texto) => ({ variant: 'success', texto })
 const fallo = (texto) => ({ variant: 'danger', texto })
@@ -28,6 +29,7 @@ export default function SolicitudDetalle() {
     ? { ...solicitud.entrevista, hora: solicitud.entrevista.hora ? formatearHora(solicitud.entrevista.hora) : '' }
     : { fecha: hoyISO(), hora: '' })
   const [errores, setErrores] = useState({})
+  const [calendarioCreado, setCalendarioCreado] = useState(false)
   const [mensaje, setMensaje] = useState(mensajeInicial ? exito(mensajeInicial) : null)
 
   if (!solicitud) {
@@ -50,7 +52,23 @@ export default function SolicitudDetalle() {
     const e = validarEntrevista(entrevista, solicitud.fechaSolicitud)
     setErrores(e)
     if (Object.keys(e).length) return
-    try { await actualizarSolicitud(solicitud.id, { entrevista, estado: 'Entrevista agendada' }); setMensaje(exito('Entrevista agendada. La solicitud pasó a la etapa Entrevista agendada.')) } catch (error) { setMensaje(fallo(`No fue posible guardar: ${error.message}`)) }
+    try { await actualizarSolicitud(solicitud.id, { entrevista, estado: 'Entrevista agendada' }); setCalendarioCreado(false); setMensaje(exito('Entrevista agendada. La solicitud pasó a la etapa Entrevista agendada.')) } catch (error) { setMensaje(fallo(`No fue posible guardar: ${error.message}`)) }
+  }
+
+  // Usa la entrevista ya guardada (no lo que esté escrito en el formulario) para que el calendario refleje lo agendado.
+  const agregarACalendario = async () => {
+    try {
+      await agendarCita({
+        candidato: candidato?.nombre ?? 'Candidato',
+        cargo: solicitud.cargo,
+        familiaCargo: solicitud.familiaCargo,
+        evaluador: solicitud.responsable,
+        fecha: solicitud.entrevista?.fecha,
+        hora: solicitud.entrevista?.hora,
+      })
+      setCalendarioCreado(true)
+      setMensaje(exito('Entrevista agregada a Google Calendar.'))
+    } catch (error) { setMensaje(fallo(`No fue posible agregarla a Google Calendar: ${error.message}`)) }
   }
 
   const marcarRealizada = async () => {
@@ -127,6 +145,11 @@ export default function SolicitudDetalle() {
             </Row>
             <div className="d-flex flex-wrap gap-2 mt-3">
               <Button onClick={agendar}>{estado === 'Evaluación recibida' ? 'Agendar entrevista' : 'Reagendar entrevista'}</Button>
+              {estado === 'Entrevista agendada' && (
+                <Button variant="outline-primary" onClick={agregarACalendario} disabled={calendarioCreado}>
+                  {calendarioCreado ? 'Agregada a Google Calendar' : 'Agregar a Google Calendar'}
+                </Button>
+              )}
               {estado === 'Entrevista agendada' && (
                 <Button variant="outline-secondary" onClick={marcarRealizada}>
                   Marcar entrevista como realizada

@@ -10,7 +10,20 @@ vi.mock('resend', () => ({
 }))
 
 describe('resendService', () => {
-  beforeEach(() => enviar.mockReset())
+  // Las pruebas no deben depender del .env de cada persona.
+  beforeEach(() => {
+    enviar.mockReset()
+    vi.stubEnv('VITE_RESEND_DESTINO_PRUEBA', '')
+    vi.stubEnv('VITE_RESEND_FROM', '')
+  })
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('usa el destino de prueba del .env cuando está definido', async () => {
+    vi.stubEnv('VITE_RESEND_DESTINO_PRUEBA', 'prueba@correo.cl')
+    enviar.mockResolvedValue({ data: { id: 'p' }, error: null })
+    await enviarCorreo({ to: 'real@correo.cl', subject: 's', html: 'h' })
+    expect(enviar.mock.calls[0][0].to).toEqual(['prueba@correo.cl'])
+  })
 
   it('crea el SDK apuntando al proxy de Vite y con una clave de relleno', () => {
     expect(creaciones[0]).toEqual(['re_proxy', { baseUrl: '/api/resend' }])

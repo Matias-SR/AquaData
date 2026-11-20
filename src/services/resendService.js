@@ -6,12 +6,11 @@ import { plantillaInformeEnviado } from '../templates/index.js'
 // el SDK exige una, pero el navegador nunca conoce la verdadera.
 const resend = new Resend('re_proxy', { baseUrl: '/api/resend' })
 
-// Con el remitente de pruebas de Resend solo se puede enviar a la casilla dueña de la cuenta.
-const REMITENTE = import.meta.env.VITE_RESEND_FROM || 'AquaData <onboarding@resend.dev>'
-const DESTINO_PRUEBA = import.meta.env.VITE_RESEND_DESTINO_PRUEBA
-
 export async function enviarCorreo({ to, subject, html, attachments }) {
-  const destino = DESTINO_PRUEBA || to
+  // Se leen al enviar (no al cargar el módulo) para que las pruebas puedan simular el .env.
+  // Con el remitente de pruebas de Resend solo se puede enviar a la casilla dueña de la cuenta.
+  const REMITENTE = import.meta.env.VITE_RESEND_FROM || 'AquaData <onboarding@resend.dev>'
+  const destino = import.meta.env.VITE_RESEND_DESTINO_PRUEBA || to
   if (!destino) throw new Error('No hay un correo de destino para enviar el aviso.')
 
   // El SDK no lanza excepciones: devuelve { data, error }.
